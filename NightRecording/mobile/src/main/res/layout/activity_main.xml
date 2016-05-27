@@ -9,8 +9,22 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="ricardotrindade.nightrecording.MainActivity">
 
-    <TextView
+    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Hello World!" />
+        android:text="Start"
+        android:id="@+id/record_btn"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="115dp"
+        android:onClick="Record" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mark Event"
+        android:id="@+id/event_btn"
+        android:layout_centerVertical="true"
+        android:layout_alignParentStart="true"
+        android:onClick="mark_event" />
 </RelativeLayout>

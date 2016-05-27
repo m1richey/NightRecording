@@ -8,18 +8,19 @@ import android.os.Vibrator;
 import android.support.wearable.activity.WearableActivity;
 import android.support.wearable.view.BoxInsetLayout;
 import android.view.View;
-import android.widget.TextView;
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.MessageApi;
+import com.google.android.gms.wearable.MessageEvent;
+import com.google.android.gms.wearable.Wearable;
 
-public class MainActivity extends WearableActivity {
+public class MainActivity extends WearableActivity implements MessageApi.MessageListener {
 
 
     private BoxInsetLayout mContainerView;
     PowerManager pm;
     PowerManager.WakeLock w1;
+    GoogleApiClient mGoogleApiClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -27,8 +28,13 @@ public class MainActivity extends WearableActivity {
         setContentView(R.layout.activity_main);
         setAmbientEnabled();
         pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        w1 = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,"Tag");
+        w1 = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Tag");
         mContainerView = (BoxInsetLayout) findViewById(R.id.container);
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .build();
+        mGoogleApiClient.connect();
+        Wearable.MessageApi.addListener(mGoogleApiClient, this);
     }
 
     @Override
@@ -37,22 +43,22 @@ public class MainActivity extends WearableActivity {
         updateDisplay();
     }
 
-    public void Start(View view){
+    public void Start(View view) {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] vibrationPattern = {0, 500, 50,500,50,500,50};
+        long[] vibrationPattern = {0, 500, 50, 500, 50, 500, 50};
         final int repeat = -1;
         vibrator.vibrate(vibrationPattern, repeat);
         w1.acquire();
-        startService(new Intent(this,SensorService.class));
+        startService(new Intent(this, SensorService.class));
     }
 
-    public void Stop(View view){
+    public void Stop(View view) {
         Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-        long[] vibrationPattern = {0, 500, 50,500,50,500,50};
+        long[] vibrationPattern = {0, 500, 50, 500, 50, 500, 50};
         final int repeat = -1;
         vibrator.vibrate(vibrationPattern, repeat);
         w1.release();
-        stopService(new Intent(this,SensorService.class));
+        stopService(new Intent(this, SensorService.class));
     }
 
     @Override
@@ -75,4 +81,28 @@ public class MainActivity extends WearableActivity {
             mContainerView.setBackground(null);
         }
     }
+
+    @Override
+    public void onMessageReceived(MessageEvent messageEvent) {
+        if (messageEvent.getPath().equals("google")) {
+            String v = new String(messageEvent.getData()); //Start ou stop
+            if (v.equals("start")) {
+                Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                long[] vibrationPattern = {0, 500, 50, 500, 50, 500, 50};
+                final int repeat = -1;
+                vibrator.vibrate(vibrationPattern, repeat);
+                w1.acquire();
+                startService(new Intent(this, SensorService.class));
+            }
+            if (v.equals("stop")) {
+                Vibrator vibrator = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+                long[] vibrationPattern = {0, 500, 50, 500, 50, 500, 50};
+                final int repeat = -1;
+                vibrator.vibrate(vibrationPattern, repeat);
+                w1.release();
+                stopService(new Intent(this, SensorService.class));
+            }
+        }
+    }
+
 }

@@ -3,6 +3,7 @@
     package="ricardotrindade.nightrecording">
 
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application
         android:allowBackup="true"
@@ -15,6 +16,10 @@
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.BIND_LISTENER" />
             </intent-filter>
         </activity>
     </application>
