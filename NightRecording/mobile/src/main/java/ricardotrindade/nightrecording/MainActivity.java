@@ -2,7 +2,6 @@ package ricardotrindade.nightrecording;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -16,19 +15,16 @@ import com.google.android.gms.wearable.Node;
 import com.google.android.gms.wearable.NodeApi;
 import com.google.android.gms.wearable.Wearable;
 
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity implements GoogleApiClient.OnConnectionFailedListener,GoogleApiClient.ConnectionCallbacks {
 
     GoogleApiClient googleApiClient;
     Button record;
     boolean recording = false;
-    File f ;
-    FileWriter fw;
+
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,26 +35,23 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 .addApi(Wearable.API)
                 .build();
         googleApiClient.connect();
-        String timeStamp = new SimpleDateFormat("yyMMdd_HHmmss").format(Calendar.getInstance().getTime());
-        f = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/sensor_data/" + timeStamp + ".txt");
-        try {
-            fw = new FileWriter(f);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+
     }
 
-    public void mark_event(View view) throws IOException {
-        String timeStamp = String.valueOf(System.currentTimeMillis());
-        fw.write(timeStamp);
+
+    public void onDestroy(){
+        super.onDestroy();
+
     }
 
 
     public void Record(View view) throws IOException {
+
         if (!recording) {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
+                    recording = true;
                     record.setText("Stop");
                     Toast.makeText(MainActivity.this, "Started Recording", Toast.LENGTH_SHORT).show();
                 }
@@ -73,11 +66,10 @@ public class MainActivity extends AppCompatActivity implements GoogleApiClient.O
                 }
             }.execute();
         } else {
-            fw.flush();
-            fw.close();
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        recording = false;
                         record.setText("Start");
                         Toast.makeText(MainActivity.this, "Recording stopped", Toast.LENGTH_SHORT).show();
                     }
